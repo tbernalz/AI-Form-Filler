@@ -1,6 +1,7 @@
 import requests
 import json
 from typing import Dict, List, Optional
+from pdf_processor import process_data
 
 
 def chat_with_ollama(
@@ -58,17 +59,16 @@ def chat_with_ollama(
 
 
 if __name__ == "__main__":
-    messages = [
-        {
-            "role": "user",
-            "content": "How to prepare for a marathon",
-        }
-    ]
     try:
-        response = chat_with_ollama(model="tinyllama", messages=messages)
-        if response:
-            print("Model response:\n", response)
-        else:
-            print("Failed to get a response from the model.")
+        pdf_location = "../data_samples"
+        db = process_data(pdf_location)
+        query = "When to use controller-based APIs?"
+        results = db.similarity_search(query, k=3)
+
+        for i, result in enumerate(results):
+            print(f"Result {i+1}:")
+            print(result.page_content)
+            print("-" * 50)
+
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
