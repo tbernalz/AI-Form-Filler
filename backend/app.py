@@ -1,6 +1,6 @@
-from config import OLLAMA_MODEL
+from config import LLM_MODEL_NAME
 from form_processor import get_form_field_descriptions
-from ollama_api import chat_with_ollama
+from open_router_api import chat_with_openrouter
 from pdf_processor import process_data
 
 if __name__ == "__main__":
@@ -21,8 +21,8 @@ if __name__ == "__main__":
                 f"Context:\n{context}"
             )
 
-            answer = chat_with_ollama(
-                model=OLLAMA_MODEL,
+            answer = chat_with_openrouter(
+                model=LLM_MODEL_NAME,
                 messages=[{"role": "user", "content": prompt}],
             )
 
