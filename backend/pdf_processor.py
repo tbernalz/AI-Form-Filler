@@ -1,4 +1,6 @@
-from langchain_community.document_loaders import PyPDFDirectoryLoader
+import os
+import fitz
+from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -24,11 +26,20 @@ def process_data(
         Exception: If any other error occurs during the processing.
     """
     try:
-        loader = PyPDFDirectoryLoader(directory)
-        docs = loader.load()
+        pdf_files = [f for f in os.listdir(directory) if f.lower().endswith(".pdf")]
+        if not pdf_files:
+            print("No PDF documents found in the specified directory.")
+            return None
+
+        docs = []
+        for pdf_file in pdf_files:
+            pdf_path = os.path.join(directory, pdf_file)
+            text = extract_text_from_pdf(pdf_path)
+            if text.strip():
+                docs.append(Document(page_content=text, metadata={"source": pdf_file}))
 
         if not docs:
-            print("No documents found in the specified directory.")
+            print("No text extracted from PDFs.")
             return None
 
         text_splitter = RecursiveCharacterTextSplitter(
@@ -46,3 +57,10 @@ def process_data(
     except Exception as e:
         print(f"An error occurred during document processing: {e}")
         raise Exception(f"An error occurred during document processing: {e}") from e
+
+
+def extract_text_from_pdf(pdf_path):
+    """Extracts text from a PDF file using PyMuPDF."""
+    doc = fitz.open(pdf_path)
+    text = "\n".join([page.get_text("text") for page in doc])
+    return text
