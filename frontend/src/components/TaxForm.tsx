@@ -15,32 +15,33 @@ const TaxForm: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-5">
-      <Waves />
       <div className="max-w-md w-full bg-white p-5 rounded-lg shadow-md z-10">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-8">
-          Simple Tax Return Form
+          Tax Form
         </h1>
         <form className="space-y-4">
           <div>
             <label htmlFor="fullName" className="block text-base text-gray-700">
-              Full Name:
+              Full Name
             </label>
             <input
               type="text"
               id="fullName"
               name="fullName"
+              readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
             <label htmlFor="ssn" className="block text-base text-gray-700 mb-1">
-              Social Security Number:
+              Social Security Number
             </label>
             <input
               type="text"
               id="ssn"
               name="ssn"
+              readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -50,12 +51,13 @@ const TaxForm: React.FC = () => {
               htmlFor="income"
               className="block text-base text-gray-700 mb-1"
             >
-              Annual Income:
+              Annual Income
             </label>
             <input
               type="text"
               id="income"
               name="income"
+              readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -65,12 +67,13 @@ const TaxForm: React.FC = () => {
               htmlFor="deductions"
               className="block text-base text-gray-700 mb-1"
             >
-              Deductions:
+              Deductions
             </label>
             <input
               type="text"
               id="deductions"
               name="deductions"
+              readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -80,12 +83,13 @@ const TaxForm: React.FC = () => {
               htmlFor="taxPaid"
               className="block text-base text-gray-700 mb-1"
             >
-              Tax Already Paid:
+              Tax Already Paid
             </label>
             <input
               type="text"
               id="taxPaid"
               name="taxPaid"
+              readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -95,12 +99,13 @@ const TaxForm: React.FC = () => {
               htmlFor="descriptions_request_for_extra_tax_return"
               className="block text-base text-gray-700 mb-1"
             >
-              Any Further Information for Extra Tax Return:
+              Any Further Information for Extra Tax Return
             </label>
             <textarea
-              id="descriptions_request_for_extra_tax_return"
-              name="descriptions_request_for_extra_tax_return"
+              id="descriptions"
               rows={5}
+              name="descriptions"
+              readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
             ></textarea>
           </div>
@@ -109,13 +114,15 @@ const TaxForm: React.FC = () => {
             type="button"
             onClick={autoFillTaxForm}
             className="w-full bg-blue-500 text-white py-2.5 px-5 rounded-md text-base hover:bg-blue-700 transition-colors"
+            disabled={isLoading}
           >
-            AI Auto-Fill Tax Form
+            {isLoading ? 'Filling...' : 'AI Auto-Fill Tax Form'}
           </button>
         </form>
 
         {isLoading && <LoadingSpinner />}
       </div>
+      <Waves />
     </div>
   );
 };
