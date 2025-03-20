@@ -4,13 +4,73 @@ import Waves from './Waves';
 
 const TaxForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    ssn: '',
+    income: '',
+    deductions: '',
+    taxPaid: '',
+    descriptions: '',
+  });
 
-  const autoFillTaxForm = () => {
+  const typeEffect = (
+    field: keyof typeof formData,
+    value: string,
+    delay: number
+  ) => {
+    let index = 0;
+
+    const typeNextChar = () => {
+      if (index < value.length) {
+        setFormData((prev) => ({
+          ...prev,
+          [field]: value.slice(0, index + 1),
+        }));
+        index++;
+        setTimeout(typeNextChar, delay);
+      }
+    };
+
+    typeNextChar();
+  };
+
+  const autoFillTaxForm = async () => {
     setIsLoading(true);
-    // API call - pending
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+
+    try {
+      const response = await fetch('http://localhost:8000/auto-fill-form', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to auto-fill form');
+      }
+
+      const data = await response.json();
+      console.log('Auto-filled data:', data);
+
+      Object.keys(formData).forEach((key, index) => {
+        setTimeout(
+          () =>
+            typeEffect(
+              key as keyof typeof formData,
+              data[key]?.toString() || '',
+              100
+            ),
+          index * 1000
+        );
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setTimeout(
+        () => setIsLoading(false),
+        Object.keys(formData).length * 1000
+      );
+    }
   };
 
   return (
@@ -27,6 +87,7 @@ const TaxForm: React.FC = () => {
             <input
               type="text"
               id="fullName"
+              value={formData.fullName}
               name="fullName"
               readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -40,6 +101,7 @@ const TaxForm: React.FC = () => {
             <input
               type="text"
               id="ssn"
+              value={formData.ssn}
               name="ssn"
               readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -56,6 +118,7 @@ const TaxForm: React.FC = () => {
             <input
               type="text"
               id="income"
+              value={formData.income}
               name="income"
               readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -72,6 +135,7 @@ const TaxForm: React.FC = () => {
             <input
               type="text"
               id="deductions"
+              value={formData.deductions}
               name="deductions"
               readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -88,6 +152,7 @@ const TaxForm: React.FC = () => {
             <input
               type="text"
               id="taxPaid"
+              value={formData.taxPaid}
               name="taxPaid"
               readOnly
               className="w-full p-2.5 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -103,6 +168,7 @@ const TaxForm: React.FC = () => {
             </label>
             <textarea
               id="descriptions"
+              value={formData.descriptions}
               rows={5}
               name="descriptions"
               readOnly
