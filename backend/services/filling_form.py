@@ -25,12 +25,17 @@ def filling_form(
     try:
         structured_responses = []
         for field in form_fields:
-            relevant_docs = db_vector.similarity_search(field["label"], k=3)
+            if not field.get("label"):
+                print(f"Skipping field with missing label: {field}")
+                continue
+            relevant_docs = db_vector.similarity_search(field["label"], k=5)
             context = "\n".join([doc.page_content for doc in relevant_docs])
 
             prompt = (
                 f"Extract the exact value for '{field['label']}' from the following context. "
-                f"Provide ONLY the value itself. If the value is not found, respond with 'N/A'"
+                f"If the field is a list (e.g., deductions, expenses, stocks), provide all items in the list as a comma-separated string. "
+                f"If the value is not found, respond with 'N/A'. "
+                f"Do not provide explanations or additional text. "
                 f"Context:\n{context}"
             )
 
@@ -39,10 +44,19 @@ def filling_form(
                 messages=[{"role": "user", "content": prompt}],
             )
 
-            structured_responses.append({**field, "response": answer.strip()})
+            if answer is None:
+                print(f"LLM returned None for field: {field['label']}")
+                structured_responses.append({**field, "response": "N/A"})
+                continue
+
+            answer = answer.strip() if answer else "N/A"
+
+            if answer != "N/A" and "," in answer:
+                answer = ", ".join(item.strip() for item in answer.split(","))
+
+            structured_responses.append({**field, "response": answer})
 
         return structured_responses
 
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        return []
+        print(f"Error processing field {field.get('id')}: {str(e)}")
